@@ -28,9 +28,32 @@ Welcome to the comprehensive learning resource for the **LLM Engineer's Handbook
 | Document | Description | Link |
 |----------|-------------|------|
 | **Curriculum** | Complete 20-week learning path | [CURRICULUM.md](./CURRICULUM.md) |
+| **Getting Started** | Setup and first steps | [GETTING_STARTED.md](./GETTING_STARTED.md) |
+| **Code Intelligence** | Graphs, architecture, and tooling | [CODEBASE-INTELLIGENCE.md](./CODEBASE-INTELLIGENCE.md) |
 | **Session 1.1** | Project Overview & DDD | [session_1.1_project_overview.md](./sessions/session_1.1_project_overview.md) |
+| **Session 1.2** | Domain Layer - Data Modeling | [session_1.2_domain_layer.md](./sessions/session_1.2_domain_layer.md) |
+| **Session 1.3** | Infrastructure Layer - Connections | [session_1.3_infrastructure_layer.md](./sessions/session_1.3_infrastructure_layer.md) |
 | **Session 2.1** | Web Crawling with Selenium | [session_2.1_web_crawling.md](./sessions/session_2.1_web_crawling.md) |
+| **Session 2.2** | Text Preprocessing Pipeline | [session_2.2_text_preprocessing.md](./sessions/session_2.2_text_preprocessing.md) |
+| **Session 2.3** | Feature Engineering Pipeline | [session_2.3_feature_engineering.md](./sessions/session_2.3_feature_engineering.md) |
+| **Session 3.1** | Instruction Dataset Creation | [session_3.1_instruction_dataset.md](./sessions/session_3.1_instruction_dataset.md) |
+| **Session 3.2** | Preference Dataset for DPO | [session_3.2_preference_dataset.md](./sessions/session_3.2_preference_dataset.md) |
 | **Session 4.1** | Advanced RAG Architecture | [session_4.1_advanced_rag.md](./sessions/session_4.1_advanced_rag.md) |
+| **Session 4.2** | Embedding Models & Cross-Encoders | [session_4.2_embedding_models.md](./sessions/session_4.2_embedding_models.md) |
+| **Session 5.1** | Supervised Fine-Tuning (SFT) | [session_5.1_sft.md](./sessions/session_5.1_sft.md) |
+| **Session 5.2** | Direct Preference Optimization | [session_5.2_dpo.md](./sessions/session_5.2_dpo.md) |
+| **Session 5.3** | AWS SageMaker Deployment | [session_5.3_sagemaker_deployment.md](./sessions/session_5.3_sagemaker_deployment.md) |
+| **Session 6.1** | FastAPI REST API | [session_6.1_fastapi_api.md](./sessions/session_6.1_fastapi_api.md) |
+| **Session 6.2** | RAG Inference Flow | [session_6.2_rag_inference_flow.md](./sessions/session_6.2_rag_inference_flow.md) |
+| **Session 7.1** | Experiment Tracking (Comet ML) | [session_7.1_comet_ml.md](./sessions/session_7.1_comet_ml.md) |
+| **Session 7.2** | Prompt Monitoring (Opik) | [session_7.2_opik_monitoring.md](./sessions/session_7.2_opik_monitoring.md) |
+| **Session 7.3** | Model Evaluation | [session_7.3_model_evaluation.md](./sessions/session_7.3_model_evaluation.md) |
+| **Session 8.1** | Docker & Local Infrastructure | [session_8.1_docker.md](./sessions/session_8.1_docker.md) |
+| **Session 8.2** | CI/CD with GitHub Actions | [session_8.2_cicd.md](./sessions/session_8.2_cicd.md) |
+| **Session 8.3** | ZenML Orchestration | [session_8.3_zenml.md](./sessions/session_8.3_zenml.md) |
+| **Session 9.1** | Data Warehouse Operations | [session_9.1_data_warehouse.md](./sessions/session_9.1_data_warehouse.md) |
+| **Session 9.2** | Performance Optimization | [session_9.2_performance.md](./sessions/session_9.2_performance.md) |
+| **Session 9.3** | Security Best Practices | [session_9.3_security.md](./sessions/session_9.3_security.md) |
 
 ### 📝 Code Snippets
 

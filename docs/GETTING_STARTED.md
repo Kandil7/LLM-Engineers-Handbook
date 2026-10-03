@@ -28,10 +28,33 @@ The complete documentation is in the `docs/` folder:
 docs/
 ├── README.md                      # Start here!
 ├── CURRICULUM.md                  # 20-week learning path
+├── GETTING_STARTED.md             # This file
+├── CODEBASE-INTELLIGENCE.md       # Graphs, architecture, tooling
 └── sessions/
     ├── session_1.1_project_overview.md
+    ├── session_1.2_domain_layer.md
+    ├── session_1.3_infrastructure_layer.md
     ├── session_2.1_web_crawling.md
-    └── session_4.1_advanced_rag.md
+    ├── session_2.2_text_preprocessing.md
+    ├── session_2.3_feature_engineering.md
+    ├── session_3.1_instruction_dataset.md
+    ├── session_3.2_preference_dataset.md
+    ├── session_4.1_advanced_rag.md
+    ├── session_4.2_embedding_models.md
+    ├── session_5.1_sft.md
+    ├── session_5.2_dpo.md
+    ├── session_5.3_sagemaker_deployment.md
+    ├── session_6.1_fastapi_api.md
+    ├── session_6.2_rag_inference_flow.md
+    ├── session_7.1_comet_ml.md
+    ├── session_7.2_opik_monitoring.md
+    ├── session_7.3_model_evaluation.md
+    ├── session_8.1_docker.md
+    ├── session_8.2_cicd.md
+    ├── session_8.3_zenml.md
+    ├── session_9.1_data_warehouse.md
+    ├── session_9.2_performance.md
+    └── session_9.3_security.md
 ```
 
 ### Step 2: Begin with Session 1.1
