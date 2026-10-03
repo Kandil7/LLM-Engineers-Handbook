@@ -4,6 +4,8 @@
   <h1>👷 LLM Engineer's Handbook</h1>
   <p class="tagline">Official repository of the <a href="https://www.amazon.com/LLM-Engineers-Handbook-engineering-production/dp/1836200072/">LLM Engineer's Handbook</a> by <a href="https://github.com/iusztinpaul">Paul Iusztin</a> and <a href="https://github.com/mlabonne">Maxime Labonne</a></p>
   <a href="https://trendshift.io/repositories/12257" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12257" alt="PacktPublishing%2FLLM-Engineers-Handbook | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  <br/>
+  <a href="docs/CODEBASE-INTELLIGENCE.md"><img src="https://img.shields.io/badge/Code_Intelligence-indexed-blue" alt="Code Intelligence"/></a>
 </div>
 </br>
 
