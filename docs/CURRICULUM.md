@@ -1,308 +1,131 @@
-# LLM Engineer's Handbook - Complete Learning Curriculum
+# LLM Engineer's Handbook - Learning Curriculum
 
-## 📚 Curriculum Overview
+## 📚 Overview
 
-This curriculum will teach you how to build a production-ready LLM system from scratch, following the **LLM Engineer's Handbook** by Paul Iusztin and Maxime Labonne.
+This is a chapter-by-chapter learning path for the **LLM Engineer's Handbook** by Paul Iusztin and Maxime Labonne. It follows the book's real structure: **11 chapters + an Appendix**. Each chapter links to detailed session walkthroughs grounded in the repository code.
+
+**See also:** [`BOOK-MAP.md`](./BOOK-MAP.md) for the exact chapter → session → code mapping.
 
 ### 🎯 Learning Outcomes
 
-By completing this curriculum, you will:
-- ✅ Master Domain-Driven Design (DDD) for ML systems
-- ✅ Build end-to-end RAG (Retrieval-Augmented Generation) pipelines
-- ✅ Fine-tune LLMs with LoRA, SFT, and DPO
-- ✅ Deploy models to AWS SageMaker
-- ✅ Orchestrate ML pipelines with ZenML
-- ✅ Monitor prompts and track experiments
-- ✅ Implement production-ready APIs with FastAPI
+By completing this curriculum, you will be able to:
+- Design an end-to-end LLM system with the **FTI (feature/training/inference)** architecture
+- Build data collection and RAG feature pipelines (crawling, cleaning, chunking, embedding)
+- Generate instruction and preference datasets, and curate them to production quality
+- Fine-tune (SFT/LoRA/QLoRA) and align (DPO) an LLM
+- Evaluate models and RAG systems with the right benchmarks
+- Optimize inference (KV cache, batching, speculative decoding, quantization)
+- Deploy a RAG microservice to AWS SageMaker and FastAPI
+- Operate it with CI/CD/CT, prompt monitoring, and alerting
 
 ---
 
-## 📖 Session-by-Session Learning Path
+## 📖 Chapter-by-Chapter Path
 
-### **Module 1: Foundations & Architecture (Week 1-2)**
+### Chapter 1 - Understanding the LLM Twin Concept and Its Architecture
+- **Sessions:** [`session_1.1_project_overview.md`](./sessions/session_1.1_project_overview.md)
+- **Topics:** what an LLM Twin is, the MVP, the FTI pipeline design, the layered (DDD) architecture.
+- **Hands-on:** map the repository layers and the dependency flow.
 
-#### Session 1.1: Project Overview & DDD Principles
-- **Goal**: Understand the layered architecture
-- **Files to Study**: 
-  - `llm_engineering/__init__.py`
-  - `llm_engineering/settings.py`
-  - `llm_engineering/domain/types.py`
-- **Key Concept**: Dependency flow: `infrastructure → model → application → domain`
-- **Hands-On**: Set up environment, configure `.env` file
+### Chapter 2 - Tooling and Installation
+- **Sessions:** [`GETTING_STARTED.md`](./GETTING_STARTED.md), [`session_1.3_infrastructure_layer.md`](./sessions/session_1.3_infrastructure_layer.md)
+- **Topics:** Poetry, Poe the Poet, ZenML, Comet ML, Opik, MongoDB, Qdrant, AWS, SageMaker.
+- **Hands-on:** bring up the local stack and verify both databases.
 
-#### Session 1.2: Domain Layer - Data Modeling
-- **Goal**: Master Pydantic and database design
-- **Files to Study**:
-  - `llm_engineering/domain/base/nosql.py` - MongoDB CRUD
-  - `llm_engineering/domain/base/vector.py` - Qdrant vector search
-  - `llm_engineering/domain/documents.py` - Document models
-  - `llm_engineering/domain/chunks.py` - Chunk models
-- **Key Concept**: Generic types, singleton pattern, strategy pattern
-- **Hands-On**: Create custom document models
+### Chapter 3 - Data Engineering
+- **Sessions:** [`session_2.1_web_crawling.md`](./sessions/session_2.1_web_crawling.md), [`session_1.2_domain_layer.md`](./sessions/session_1.2_domain_layer.md), [`session_1.3_infrastructure_layer.md`](./sessions/session_1.3_infrastructure_layer.md)
+- **Topics:** the data collection pipeline, crawler dispatcher, Selenium crawlers, the NoSQL data warehouse, the **ODM** pattern.
+- **Hands-on:** add a custom crawler and inspect the warehouse.
 
-#### Session 1.3: Infrastructure Layer - Database Connections
-- **Goal**: Understand database connection management
-- **Files to Study**:
-  - `llm_engineering/infrastructure/db/mongo.py`
-  - `llm_engineering/infrastructure/db/qdrant.py`
-- **Key Concept**: Singleton pattern for connections
-- **Hands-On**: Test MongoDB and Qdrant connections
+### Chapter 4 - RAG Feature Pipeline
+- **Sessions:** [`session_2.2_text_preprocessing.md`](./sessions/session_2.2_text_preprocessing.md), [`session_2.3_feature_engineering.md`](./sessions/session_2.3_feature_engineering.md), [`session_4.2_embedding_models.md`](./sessions/session_4.2_embedding_models.md), [`session_4.3_streaming_cdc.md`](./sessions/session_4.3_streaming_cdc.md)
+- **Topics:** RAG basics, embeddings, vector DBs, advanced RAG overview, cleaning, chunking, embedding, the **OVM** pattern, batch vs streaming and CDC.
+- **Hands-on:** run the feature pipeline and search the vector store.
 
----
+### Chapter 5 - Supervised Fine-Tuning
+- **Sessions:** [`session_3.1_instruction_dataset.md`](./sessions/session_3.1_instruction_dataset.md), [`session_5.4_data_curation.md`](./sessions/session_5.4_data_curation.md), [`session_5.1_sft.md`](./sessions/session_5.1_sft.md)
+- **Topics:** instruction dataset creation and curation (filtering, dedup, decontamination, augmentation), SFT, LoRA/QLoRA, training parameters.
+- **Hands-on:** generate and curate an instruction dataset, then fine-tune.
 
-### **Module 2: Data Engineering Pipelines (Week 3-5)**
+### Chapter 6 - Fine-Tuning with Preference Alignment
+- **Sessions:** [`session_3.2_preference_dataset.md`](./sessions/session_3.2_preference_dataset.md), [`session_5.2_dpo.md`](./sessions/session_5.2_dpo.md)
+- **Topics:** preference datasets (chosen/rejected), RLHF vs DPO, the DPO objective and beta.
+- **Hands-on:** build a preference dataset and run DPO.
 
-#### Session 2.1: Web Crawling with Selenium
-- **Goal**: Build scalable web crawlers
-- **Files to Study**:
-  - `llm_engineering/application/crawlers/base.py`
-  - `llm_engineering/application/crawlers/dispatcher.py`
-  - `llm_engineering/application/crawlers/github.py`
-  - `llm_engineering/application/crawlers/medium.py`
-- **Key Concept**: Crawler dispatcher pattern, Selenium automation
-- **Hands-On**: Add custom website crawler
+### Chapter 7 - Evaluating LLMs
+- **Sessions:** [`session_7.3_model_evaluation.md`](./sessions/session_7.3_model_evaluation.md), [`session_7.4_rag_evaluation.md`](./sessions/session_7.4_rag_evaluation.md)
+- **Topics:** ML vs LLM evaluation, general/domain/task-specific benchmarks, LLM-as-a-judge, RAG evaluation with **Ragas** and **ARES**.
+- **Hands-on:** run the project's judge and a Ragas evaluation.
 
-#### Session 2.2: Text Preprocessing Pipeline
-- **Goal**: Implement text cleaning and chunking
-- **Files to Study**:
-  - `llm_engineering/application/preprocessing/dispatchers.py`
-  - `llm_engineering/application/preprocessing/operations/cleaning.py`
-  - `llm_engineering/application/preprocessing/operations/chunking.py`
-- **Key Concept**: Handler pattern, LangChain text splitters
-- **Hands-On**: Create custom cleaning rules
+### Chapter 8 - Inference Optimization
+- **Sessions:** [`session_8.4_inference_optimization.md`](./sessions/session_8.4_inference_optimization.md)
+- **Topics:** KV cache, continuous batching, speculative decoding, optimized attention, model parallelism, quantization (GGUF, GPTQ, EXL2, AWQ), inference engines (TGI, vLLM, TensorRT-LLM).
+- **Hands-on:** estimate a KV cache, compare quantization formats, measure batching.
 
-#### Session 2.3: Feature Engineering Pipeline
-- **Goal**: Generate embeddings and load to vector DB
-- **Files to Study**:
-  - `llm_engineering/application/preprocessing/embedding_data_handlers.py`
-  - `llm_engineering/application/networks/embeddings.py`
-  - `pipelines/feature_engineering.py`
-- **Key Concept**: Sentence transformers, vector indexing
-- **Hands-On**: Experiment with different embedding models
+### Chapter 9 - RAG Inference Pipeline
+- **Sessions:** [`session_4.1_advanced_rag.md`](./sessions/session_4.1_advanced_rag.md), [`session_6.2_rag_inference_flow.md`](./sessions/session_6.2_rag_inference_flow.md), [`session_4.2_embedding_models.md`](./sessions/session_4.2_embedding_models.md)
+- **Topics:** query expansion, self-querying, filtered vector search, reranking, the end-to-end inference flow.
+- **Hands-on:** trace a query through retrieval to generation.
 
----
+### Chapter 10 - Inference Pipeline Deployment
+- **Sessions:** [`session_5.3_sagemaker_deployment.md`](./sessions/session_5.3_sagemaker_deployment.md), [`session_6.1_fastapi_api.md`](./sessions/session_6.1_fastapi_api.md), [`session_10.1_deployment_topologies.md`](./sessions/session_10.1_deployment_topologies.md)
+- **Topics:** deployment types (online/asynchronous/batch), monolithic vs microservices, Hugging Face DLCs, SageMaker endpoints, FastAPI, autoscaling.
+- **Hands-on:** deploy the model and call the FastAPI RAG service.
 
-### **Module 3: Dataset Generation (Week 6-7)**
+### Chapter 11 - MLOps and LLMOps
+- **Sessions:** [`session_7.1_comet_ml.md`](./sessions/session_7.1_comet_ml.md), [`session_7.2_opik_monitoring.md`](./sessions/session_7.2_opik_monitoring.md), [`session_8.1_docker.md`](./sessions/session_8.1_docker.md), [`session_8.2_cicd.md`](./sessions/session_8.2_cicd.md), [`session_8.3_zenml.md`](./sessions/session_8.3_zenml.md), [`session_9.1_data_warehouse.md`](./sessions/session_9.1_data_warehouse.md), [`session_11.1_ct_pipeline_alerting.md`](./sessions/session_11.1_ct_pipeline_alerting.md)
+- **Topics:** DevOps → MLOps → LLMOps, CI/CD/CT, cloud deployment, prompt monitoring, guardrails, human feedback, alerting.
+- **Hands-on:** wire a CT trigger and an alerter, and add production feedback.
 
-#### Session 3.1: Instruction Dataset Creation
-- **Goal**: Generate instruction-answer pairs with LLMs
-- **Files to Study**:
-  - `llm_engineering/application/dataset/generation.py`
-  - `llm_engineering/application/dataset/output_parsers.py`
-  - `pipelines/generate_datasets.py`
-- **Key Concept**: Prompt engineering, structured output parsing
-- **Hands-On**: Create custom prompt templates
-
-#### Session 3.2: Preference Dataset for DPO
-- **Goal**: Generate chosen/rejected pairs for alignment
-- **Files to Study**:
-  - `llm_engineering/application/dataset/generation.py` (PreferenceDatasetGenerator)
-  - `llm_engineering/domain/dataset.py`
-- **Key Concept**: Direct Preference Optimization theory
-- **Hands-On**: Implement quality filters
+### Appendix - MLOps Principles
+- **Sessions:** [`appendix_mlops_principles.md`](./sessions/appendix_mlops_principles.md)
+- **Topics:** automation, versioning, experiment tracking, testing, monitoring, reproducibility.
+- **Hands-on:** audit the project against the six principles and close a gap.
 
 ---
 
-### **Module 4: Advanced RAG System (Week 8-9)**
+## 🔧 Quick Reference
 
-#### Session 4.1: RAG Architecture Deep Dive
-- **Goal**: Implement multi-stage retrieval
-- **Files to Study**:
-  - `llm_engineering/application/rag/retriever.py`
-  - `llm_engineering/application/rag/query_expanison.py`
-  - `llm_engineering/application/rag/reranking.py`
-  - `llm_engineering/application/rag/self_query.py`
-- **Key Concept**: Query expansion, reranking, metadata filtering
-- **Hands-On**: Implement HyDE (Hypothetical Document Embeddings)
-
-#### Session 4.2: Embedding Models & Cross-Encoders
-- **Goal**: Master embedding generation and reranking
-- **Files to Study**:
-  - `llm_engineering/application/networks/embeddings.py`
-  - `llm_engineering/application/networks/base.py`
-- **Key Concept**: Cosine similarity, cross-encoder scoring
-- **Hands-On**: Compare embedding models
-
----
-
-### **Module 5: LLM Training & Fine-Tuning (Week 10-12)**
-
-#### Session 5.1: Supervised Fine-Tuning (SFT)
-- **Goal**: Fine-tune Llama with LoRA
-- **Files to Study**:
-  - `llm_engineering/model/finetuning/finetune.py`
-  - `llm_engineering/model/finetuning/sagemaker.py`
-- **Key Concept**: LoRA, Unsloth optimization, packing
-- **Hands-On**: Train on custom dataset
-
-#### Session 5.2: Direct Preference Optimization (DPO)
-- **Goal**: Align model with human preferences
-- **Files to Study**:
-  - `llm_engineering/model/finetuning/finetune.py` (DPO section)
-- **Key Concept**: DPO loss, KL penalty
-- **Hands-On**: Compare SFT vs DPO outputs
-
-#### Session 5.3: AWS SageMaker Deployment
-- **Goal**: Deploy models to production
-- **Files to Study**:
-  - `llm_engineering/infrastructure/aws/deploy/huggingface/run.py`
-  - `llm_engineering/infrastructure/aws/deploy/huggingface/sagemaker_huggingface.py`
-- **Key Concept**: SageMaker endpoints, IAM roles
-- **Hands-On**: Deploy custom model
-
----
-
-### **Module 6: Inference & APIs (Week 13-14)**
-
-#### Session 6.1: FastAPI REST API
-- **Goal**: Build production inference API
-- **Files to Study**:
-  - `llm_engineering/infrastructure/inference_pipeline_api.py`
-  - `llm_engineering/model/inference/inference.py`
-- **Key Concept**: Async endpoints, request validation
-- **Hands-On**: Add streaming responses
-
-#### Session 6.2: RAG Inference Flow
-- **Goal**: Integrate retrieval with generation
-- **Files to Study**:
-  - `tools/rag.py`
-  - `llm_engineering/infrastructure/opik_utils.py`
-- **Key Concept**: End-to-end RAG pipeline, tracing
-- **Hands-On**: Implement citation tracking
-
----
-
-### **Module 7: Monitoring & Evaluation (Week 15-16)**
-
-#### Session 7.1: Experiment Tracking with Comet ML
-- **Goal**: Track and compare experiments
-- **Files to Study**: Training scripts with `report_to="comet_ml"`
-- **Key Concept**: Metrics logging, dashboard creation
-- **Hands-On**: Set up Comet ML dashboard
-
-#### Session 7.2: Prompt Monitoring with Opik
-- **Goal**: Monitor LLM prompts and responses
-- **Files to Study**:
-  - `llm_engineering/infrastructure/opik_utils.py`
-- **Key Concept**: Trace metadata, prompt analysis
-- **Hands-On**: Create custom traces
-
-#### Session 7.3: Model Evaluation
-- **Goal**: Evaluate LLM outputs automatically
-- **Files to Study**:
-  - `llm_engineering/model/evaluation/evaluate.py`
-- **Key Concept**: LLM-as-a-judge, pairwise comparison
-- **Hands-On**: Create evaluation metrics
-
----
-
-### **Module 8: Production Deployment (Week 17-18)**
-
-#### Session 8.1: Docker & Local Infrastructure
-- **Goal**: Containerize applications
-- **Files to Study**:
-  - `Dockerfile`
-  - `docker-compose.yml`
-- **Key Concept**: Multi-stage builds, service orchestration
-- **Hands-On**: Build custom Docker image
-
-#### Session 8.2: CI/CD with GitHub Actions
-- **Goal**: Automate testing and deployment
-- **Files to Study**:
-  - `.github/workflows/ci.yaml`
-  - `.github/workflows/cd.yaml`
-- **Key Concept**: Pipeline automation, deployment gates
-- **Hands-On**: Add custom workflows
-
-#### Session 8.3: ZenML Orchestration
-- **Goal**: Orchestrate ML pipelines
-- **Files to Study**:
-  - `pipelines/*.py` (all pipeline files)
-  - `steps/*.py` (all step files)
-- **Key Concept**: DAG execution, artifact passing
-- **Hands-On**: Create custom pipeline
-
----
-
-### **Module 9: Advanced Topics (Week 19-20)**
-
-#### Session 9.1: Data Warehouse Operations
-- **Goal**: Backup and restore data
-- **Files to Study**:
-  - `tools/data_warehouse.py`
-- **Key Concept**: Data export/import, versioning
-- **Hands-On**: Implement incremental backups
-
-#### Session 9.2: Performance Optimization
-- **Goal**: Optimize inference latency
-- **Key Concepts**: Batching, caching, quantization
-- **Hands-On**: Profile and optimize code
-
-#### Session 9.3: Security Best Practices
-- **Goal**: Secure API endpoints
-- **Key Concepts**: Authentication, rate limiting, input validation
-- **Hands-On**: Add JWT authentication
-
----
-
-## 🎯 Capstone Projects
-
-### Project 1: Build Your LLM Twin
-- Collect your writing samples
-- Generate custom instruction dataset
-- Fine-tune Llama 3.1 8B
-- Deploy RAG system
-
-### Project 2: Production RAG System
-- Implement advanced RAG features
-- Add monitoring and evaluation
-- Deploy to AWS with auto-scaling
-
-### Project 3: Multi-Tenant LLM Platform
-- Support multiple users
-- Implement billing and quotas
-- Create admin dashboard
-
----
-
-## 📚 Quick Reference
-
-### Key Commands
+### Essential Commands
 
 ```bash
-# Activate environment
+# Environment
 .venv\Scripts\activate
 
-# Start ZenML server
-zenml up --port 8237
+# Local infrastructure
+poetry poe local-docker-infrastructure-up
+poetry poe local-zenml-server-up
+poetry poe set-local-stack
 
-# Run ETL pipeline
+# Pipelines
 python -m tools.run --run-etl --no-cache
-
-# Run feature engineering
 python -m tools.run --run-feature-engineering --no-cache
+python -m tools.run --run-generate-instruct-datasets --no-cache
+python -m tools.run --run-generate-preference-datasets --no-cache
+python -m tools.run --run-training --no-cache
+python -m tools.run --run-evaluation
 
-# Start inference API
+# Inference
 python -m tools.ml_service
-
-# Test RAG
 python -m tools.rag
 ```
 
 ### Access Dashboards
 
-- **ZenML**: http://localhost:8237 (username: `default`, password: empty)
-- **Qdrant**: http://localhost:6333/dashboard
-- **MongoDB**: Use MongoDB Compass with `mongodb://llm_engineering:llm_engineering@127.0.0.1:27017`
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **ZenML** | http://localhost:8237 | username: `default`, password: (empty) |
+| **Qdrant** | http://localhost:6333/dashboard | None (local) |
+| **MongoDB** | mongodb://127.0.0.1:27017 | llm_engineering / llm_engineering |
+| **Comet ML** | https://www.comet.com/ | Your account |
+| **Opik** | https://www.comet.com/opik | Your account |
 
----
-
-## 🔧 Tools & Technologies
+### Tools and Technologies
 
 | Category | Tools |
 |----------|-------|
 | **Core** | Python 3.11, Pydantic, FastAPI |
-| **ML/LLM** | Transformers, Unsloth, Sentence Transformers, LangChain |
+| **ML/LLM** | Transformers, Unsloth, Sentence Transformers, LangChain, vLLM |
 | **Databases** | MongoDB, Qdrant |
 | **Cloud** | AWS SageMaker, Docker, GitHub Actions |
 | **Monitoring** | Comet ML, Opik |
@@ -312,21 +135,21 @@ python -m tools.rag
 
 ## 📈 Progress Tracking
 
-Use this checklist to track your progress:
+Track by chapter:
 
-- [ ] Module 1: Foundations complete
-- [ ] Module 2: Data Engineering complete
-- [ ] Module 3: Dataset Generation complete
-- [ ] Module 4: RAG System complete
-- [ ] Module 5: LLM Training complete
-- [ ] Module 6: Inference & APIs complete
-- [ ] Module 7: Monitoring & Evaluation complete
-- [ ] Module 8: Production Deployment complete
-- [ ] Module 9: Advanced Topics complete
-- [ ] Capstone Project complete
+- [ ] Chapter 1: Concept and architecture
+- [ ] Chapter 2: Tooling and installation
+- [ ] Chapter 3: Data engineering
+- [ ] Chapter 4: RAG feature pipeline
+- [ ] Chapter 5: Supervised fine-tuning
+- [ ] Chapter 6: Preference alignment
+- [ ] Chapter 7: Evaluating LLMs
+- [ ] Chapter 8: Inference optimization
+- [ ] Chapter 9: RAG inference pipeline
+- [ ] Chapter 10: Inference pipeline deployment
+- [ ] Chapter 11: MLOps and LLMOps
+- [ ] Appendix: MLOps principles
 
 ---
 
-**Next Steps**: Start with **Session 1.1** and work through each session sequentially. Each session builds on previous knowledge.
-
-For detailed code examples and explanations, refer to the specific files mentioned in each session.
+**Next Steps**: Open the book at Chapter 1 and follow `session_1.1`. Use `BOOK-MAP.md` to jump to any chapter's sessions.

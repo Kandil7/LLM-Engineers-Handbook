@@ -27,7 +27,8 @@ The complete documentation is in the `docs/` folder:
 ```
 docs/
 ├── README.md                      # Start here!
-├── CURRICULUM.md                  # 20-week learning path
+├── CURRICULUM.md                  # Chapter-by-chapter learning path
+├── BOOK-MAP.md                    # Chapter -> session -> code map
 ├── GETTING_STARTED.md             # This file
 ├── CODEBASE-INTELLIGENCE.md       # Graphs, architecture, tooling
 └── sessions/
@@ -41,20 +42,27 @@ docs/
     ├── session_3.2_preference_dataset.md
     ├── session_4.1_advanced_rag.md
     ├── session_4.2_embedding_models.md
+    ├── session_4.3_streaming_cdc.md
     ├── session_5.1_sft.md
     ├── session_5.2_dpo.md
     ├── session_5.3_sagemaker_deployment.md
+    ├── session_5.4_data_curation.md
     ├── session_6.1_fastapi_api.md
     ├── session_6.2_rag_inference_flow.md
     ├── session_7.1_comet_ml.md
     ├── session_7.2_opik_monitoring.md
     ├── session_7.3_model_evaluation.md
+    ├── session_7.4_rag_evaluation.md
     ├── session_8.1_docker.md
     ├── session_8.2_cicd.md
     ├── session_8.3_zenml.md
+    ├── session_8.4_inference_optimization.md
     ├── session_9.1_data_warehouse.md
     ├── session_9.2_performance.md
-    └── session_9.3_security.md
+    ├── session_9.3_security.md
+    ├── session_10.1_deployment_topologies.md
+    ├── session_11.1_ct_pipeline_alerting.md
+    └── appendix_mlops_principles.md
 ```
 
 ### Step 2: Begin with Session 1.1
