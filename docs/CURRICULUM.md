@@ -4,7 +4,7 @@
 
 This is a chapter-by-chapter learning path for the **LLM Engineer's Handbook** by Paul Iusztin and Maxime Labonne. It follows the book's real structure: **11 chapters + an Appendix**. Each chapter links to detailed session walkthroughs grounded in the repository code.
 
-**See also:** [`BOOK-MAP.md`](./BOOK-MAP.md) for the exact chapter → session → code mapping, each chapter's Definition of Done, the dependency order, and the cloud-gated backlog, and [`DECISIONS.md`](./DECISIONS.md) for the Architecture Decision Record (ADR) log.
+**See also:** [`BOOK-MAP.md`](./BOOK-MAP.md) for the exact chapter → session → code mapping, each chapter's Definition of Done, the dependency order, and the cloud-gated backlog, [`READING-PLAN.md`](./READING-PLAN.md) for the prioritized study strategy, and [`DECISIONS.md`](./DECISIONS.md) for the Architecture Decision Record (ADR) log.
 
 ### 🎯 Learning Outcomes
 
@@ -152,4 +152,4 @@ Track by chapter:
 
 ---
 
-**Next Steps**: Open the book at Chapter 1 and follow `session_1.1`. Use [`BOOK-MAP.md`](./BOOK-MAP.md) to jump to any chapter's sessions, track each chapter's status (Covered → Implemented → Tested → Deployed), and record engineering decisions in [`DECISIONS.md`](./DECISIONS.md).
+**Next Steps**: Start with [`READING-PLAN.md`](./READING-PLAN.md) to learn in priority order, then open the book at Chapter 1 and follow `session_1.1`. Use [`BOOK-MAP.md`](./BOOK-MAP.md) to jump to any chapter's sessions, track each chapter's status (Covered → Implemented → Tested → Deployed), and record engineering decisions in [`DECISIONS.md`](./DECISIONS.md).

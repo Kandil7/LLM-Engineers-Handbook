@@ -29,6 +29,7 @@ Welcome to the comprehensive learning resource for the **LLM Engineer's Handbook
 |----------|-------------|------|
 | **Curriculum** | Chapter-by-chapter learning path (11 chapters + Appendix) | [CURRICULUM.md](./CURRICULUM.md) |
 | **Book Map** | Chapter -> session -> code mapping and per-chapter Definition of Done | [BOOK-MAP.md](./BOOK-MAP.md) |
+| **Reading Plan** | Prioritized study strategy: menu of decisions, from scratch to production | [READING-PLAN.md](./READING-PLAN.md) |
 | **Decisions** | Architecture Decision Records (ADR log) referenced by the Book Map | [DECISIONS.md](./DECISIONS.md) |
 | **Getting Started** | Setup and first steps | [GETTING_STARTED.md](./GETTING_STARTED.md) |
 | **Code Intelligence** | Graphs, architecture, and tooling | [CODEBASE-INTELLIGENCE.md](./CODEBASE-INTELLIGENCE.md) |

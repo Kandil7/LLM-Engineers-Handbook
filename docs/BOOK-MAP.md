@@ -6,6 +6,8 @@ It has two layers. The first is navigation: find the chapter you are studying an
 
 Use it to navigate by the book you have open, rather than by the derived session numbering, and to track mastery from `Covered` to `Deployed`.
 
+**Study strategy**: see [`READING-PLAN.md`](./READING-PLAN.md) for the prioritized menu of decisions and the read-depth rules; this map is the reference underneath it.
+
 ## Chapter-to-session map
 
 | Book chapter | Pages | Sessions | Primary repository code | Status |
