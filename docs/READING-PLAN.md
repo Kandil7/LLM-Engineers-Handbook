@@ -65,4 +65,4 @@ These are the forks the book exposes. Make each one yourself, record it in `DECI
 
 You have finished when, from a clean machine, you can rebuild the full FTI system, justify every decision in the menu above, and produce four artifacts: a RAG API that returns cited answers, a frozen eval suite, an ADR for each decision, and a fine-tuned model that measurably beats its own baseline.
 
-See also: `BOOK-MAP.md`, `CURRICULUM.md`, `DECISIONS.md`, `GETTING_STARTED.md`.
+See also: `BOOK-MAP.md`, `CURRICULUM.md`, `ROADMAP.md`, `DECISIONS.md`, `GETTING_STARTED.md`.
