@@ -204,13 +204,16 @@ class EmbeddingModelSingleton(metaclass=SingletonMeta):
 
 ```python
 from sentence_transformers import SentenceTransformer
+
 model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode([
-    "The dog sits outside waiting for a treat.",
-    "I am going swimming.",
-    "The dog is swimming.",
-])
-print(embeddings.shape)   # [3, 384]
+embeddings = model.encode(
+    [
+        "The dog sits outside waiting for a treat.",
+        "I am going swimming.",
+        "The dog is swimming.",
+    ]
+)
+print(embeddings.shape)  # [3, 384]
 ```
 
 **Why `embedding_size` probes with `""`.** A single cheap `encode("")` returns a vector whose length is the true output dimension. This is more robust than hard-coding 384: swap the model and the size follows automatically. `_create_collection` reads it:
@@ -253,7 +256,7 @@ So the vector dimension and the collection size **can never disagree at creation
 
 ```python
 # llm_engineering/application/preprocessing/embedding_data_handlers.py
-metadata={
+metadata = {
     "embedding_model_id": embedding_model.model_id,
     "embedding_size": embedding_model.embedding_size,
     "max_input_length": embedding_model.max_input_length,
@@ -447,11 +450,12 @@ When off-the-shelf quality is insufficient for domain jargon, you have two optio
 
 ```python
 from InstructorEmbedding import INSTRUCTOR
+
 model = INSTRUCTOR("hkunlp/instructor-base")
 sentence = "RAG Fundamentals First"
 instruction = "Represent the title of an article about AI:"
 embeddings = model.encode([[instruction, sentence]])
-print(embeddings.shape)   # (1, 768)
+print(embeddings.shape)  # (1, 768)
 ```
 
 The project does not fine-tune embeddings; it relies on the pretrained MiniLM and invests in retrieval techniques instead. That is a deliberate trade-off: fine-tuning consumes compute and human effort, while query expansion / reranking / filtering give large gains with less cost.
@@ -475,10 +479,13 @@ If you swap to `e5` or `bge` and recall drops, the missing prefix is the first s
 ```python
 from PIL import Image
 from sentence_transformers import SentenceTransformer
+
 model = SentenceTransformer("clip-ViT-B-32")
 img_emb = model.encode(image)
-text_emb = model.encode(["A crazy cat smiling.", "A white and brown cat with a yellow bandana.", "A man eating in the garden."])
-print(text_emb.shape)                       # (3, 512)
+text_emb = model.encode(
+    ["A crazy cat smiling.", "A white and brown cat with a yellow bandana.", "A man eating in the garden."]
+)
+print(text_emb.shape)  # (3, 512)
 print(model.similarity(img_emb, text_emb))  # tensor([[0.3068, 0.3300, 0.1719]])
 ```
 
@@ -533,8 +540,8 @@ from llm_engineering.application.networks import EmbeddingModelSingleton
 
 m = EmbeddingModelSingleton()
 print("model_id      :", m.model_id)
-print("embedding_size:", m.embedding_size)     # 384 for all-MiniLM-L6-v2
-print("max_input_len :", m.max_input_length)   # 256 for all-MiniLM-L6-v2
+print("embedding_size:", m.embedding_size)  # 384 for all-MiniLM-L6-v2
+print("max_input_len :", m.max_input_length)  # 256 for all-MiniLM-L6-v2
 print("device        :", m._device)
 ```
 
@@ -576,6 +583,7 @@ The two relevant passages should score clearly above the Eiffel Tower passage. A
 
 ```python
 import torch
+
 print("CUDA available :", torch.cuda.is_available())
 print("bf16 supported :", torch.cuda.is_bf16_supported())  # False on Turing RTX 5000
 print("device name    :", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu")

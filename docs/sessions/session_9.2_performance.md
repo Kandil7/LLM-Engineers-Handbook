@@ -490,8 +490,9 @@ Decision matrix:
 
 ```python
 import torch
+
 free, total = torch.cuda.mem_get_info()
-print(f"free {free/1024**2:.0f} MB / total {total/1024**2:.0f} MB")
+print(f"free {free / 1024**2:.0f} MB / total {total / 1024**2:.0f} MB")
 ```
 
 Only move the RAG models to GPU if the free memory comfortably exceeds the models' working set plus the KV/activation headroom of whatever else runs.

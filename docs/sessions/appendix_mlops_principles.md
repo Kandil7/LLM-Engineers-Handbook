@@ -251,9 +251,9 @@ concept drift : the rule changes      (P(y|X))  ← hardest to detect
 ```python
 from alibi_detect.cd import KSDrift, MMDDrift
 
-cd = KSDrift(X_ref, p_val=.05, preprocess_fn=preprocess_fn, input_shape=(max_len,))
+cd = KSDrift(X_ref, p_val=0.05, preprocess_fn=preprocess_fn, input_shape=(max_len,))
 # or, for embeddings:
-cd = MMDDrift(x_ref, backend="pytorch", p_val=.05)
+cd = MMDDrift(x_ref, backend="pytorch", p_val=0.05)
 cd.predict(x)
 ```
 
@@ -312,6 +312,7 @@ Add a real unit test for `clean_text`:
 ```python
 def test_clean_text_removes_symbols():
     from llm_engineering.application.preprocessing.operations.cleaning import clean_text
+
     assert clean_text("# Hello *world*!") == "Hello world!"
     assert clean_text("a    b") == "a b"
 ```

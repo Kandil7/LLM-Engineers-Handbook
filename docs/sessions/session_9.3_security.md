@@ -467,7 +467,7 @@ The real risk appears when the *template* is attacker-influenced. `InferenceExec
 
 ```python
 # If an attacker controls the template:
-"{query.__class__.__mro__}".format(query="hello")   # leaks the class hierarchy
+"{query.__class__.__mro__}".format(query="hello")  # leaks the class hierarchy
 "{query.__init__.__globals__}".format(query="hello")  # can expose process internals
 ```
 
@@ -478,6 +478,7 @@ def render(template: str, **values) -> str:
     # reject unexpected field names rather than executing attribute access
     allowed = set(values)
     import string
+
     for _, field, _, _ in string.Formatter().parse(template):
         if field and field not in allowed:
             raise ValueError(f"Disallowed template field: {field!r}")

@@ -547,6 +547,7 @@ def bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> bool:
             return False
     return True
 
+
 @classmethod
 def _bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> None:
     points = [doc.to_point() for doc in documents]

@@ -151,14 +151,15 @@ class NoSQLBaseDocument(BaseModel, Generic[T], ABC):
 **Identity and hashing** (verbatim):
 
 ```python
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, self.__class__):
-            return False
+def __eq__(self, value: object) -> bool:
+    if not isinstance(value, self.__class__):
+        return False
 
-        return self.id == value.id
+    return self.id == value.id
 
-    def __hash__(self) -> int:
-        return hash(self.id)
+
+def __hash__(self) -> int:
+    return hash(self.id)
 ```
 
 Equality is by `id`, not by all fields. This makes de-duplication trivial:
@@ -172,32 +173,33 @@ It also means two documents with identical content but different ids are *not* e
 **The Mongo ⇄ Pydantic translation layer** (verbatim):
 
 ```python
-    @classmethod
-    def from_mongo(cls: Type[T], data: dict) -> T:
-        """Convert "_id" (str object) into "id" (UUID object)."""
+@classmethod
+def from_mongo(cls: Type[T], data: dict) -> T:
+    """Convert "_id" (str object) into "id" (UUID object)."""
 
-        if not data:
-            raise ValueError("Data is empty.")
+    if not data:
+        raise ValueError("Data is empty.")
 
-        id = data.pop("_id")
+    id = data.pop("_id")
 
-        return cls(**dict(data, id=id))
+    return cls(**dict(data, id=id))
 
-    def to_mongo(self: T, **kwargs) -> dict:
-        """Convert "id" (UUID object) into "_id" (str object)."""
-        exclude_unset = kwargs.pop("exclude_unset", False)
-        by_alias = kwargs.pop("by_alias", True)
 
-        parsed = self.model_dump(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs)
+def to_mongo(self: T, **kwargs) -> dict:
+    """Convert "id" (UUID object) into "_id" (str object)."""
+    exclude_unset = kwargs.pop("exclude_unset", False)
+    by_alias = kwargs.pop("by_alias", True)
 
-        if "_id" not in parsed and "id" in parsed:
-            parsed["_id"] = str(parsed.pop("id"))
+    parsed = self.model_dump(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs)
 
-        for key, value in parsed.items():
-            if isinstance(value, uuid.UUID):
-                parsed[key] = str(value)
+    if "_id" not in parsed and "id" in parsed:
+        parsed["_id"] = str(parsed.pop("id"))
 
-        return parsed
+    for key, value in parsed.items():
+        if isinstance(value, uuid.UUID):
+            parsed[key] = str(value)
+
+    return parsed
 ```
 
 **Why this matters**: MongoDB's primary key is `_id` (a string/ObjectId), while the Python model uses `id: UUID4`. The two methods form a clean seam so no other layer worries about the difference.
@@ -220,70 +222,74 @@ There is also a `model_dump` override that stringifies UUIDs recursively *at the
 **Full CRUD surface** (verbatim):
 
 ```python
-    def save(self: T, **kwargs) -> T | None:
-        collection = _database[self.get_collection_name()]
-        try:
-            collection.insert_one(self.to_mongo(**kwargs))
+def save(self: T, **kwargs) -> T | None:
+    collection = _database[self.get_collection_name()]
+    try:
+        collection.insert_one(self.to_mongo(**kwargs))
 
-            return self
-        except errors.WriteError:
-            logger.exception("Failed to insert document.")
+        return self
+    except errors.WriteError:
+        logger.exception("Failed to insert document.")
 
-            return None
+        return None
 
-    @classmethod
-    def get_or_create(cls: Type[T], **filter_options) -> T:
-        collection = _database[cls.get_collection_name()]
-        try:
-            instance = collection.find_one(filter_options)
-            if instance:
-                return cls.from_mongo(instance)
 
-            new_instance = cls(**filter_options)
-            new_instance = new_instance.save()
+@classmethod
+def get_or_create(cls: Type[T], **filter_options) -> T:
+    collection = _database[cls.get_collection_name()]
+    try:
+        instance = collection.find_one(filter_options)
+        if instance:
+            return cls.from_mongo(instance)
 
-            return new_instance
-        except errors.OperationFailure:
-            logger.exception(f"Failed to retrieve document with filter options: {filter_options}")
+        new_instance = cls(**filter_options)
+        new_instance = new_instance.save()
 
-            raise
+        return new_instance
+    except errors.OperationFailure:
+        logger.exception(f"Failed to retrieve document with filter options: {filter_options}")
 
-    @classmethod
-    def bulk_insert(cls: Type[T], documents: list[T], **kwargs) -> bool:
-        collection = _database[cls.get_collection_name()]
-        try:
-            collection.insert_many([doc.to_mongo(**kwargs) for doc in documents])
+        raise
 
-            return True
-        except (errors.WriteError, errors.BulkWriteError):
-            logger.error(f"Failed to insert documents of type {cls.__name__}")
 
-            return False
+@classmethod
+def bulk_insert(cls: Type[T], documents: list[T], **kwargs) -> bool:
+    collection = _database[cls.get_collection_name()]
+    try:
+        collection.insert_many([doc.to_mongo(**kwargs) for doc in documents])
 
-    @classmethod
-    def find(cls: Type[T], **filter_options) -> T | None:
-        collection = _database[cls.get_collection_name()]
-        try:
-            instance = collection.find_one(filter_options)
-            if instance:
-                return cls.from_mongo(instance)
+        return True
+    except (errors.WriteError, errors.BulkWriteError):
+        logger.error(f"Failed to insert documents of type {cls.__name__}")
 
-            return None
-        except errors.OperationFailure:
-            logger.error("Failed to retrieve document")
+        return False
 
-            return None
 
-    @classmethod
-    def bulk_find(cls: Type[T], **filter_options) -> list[T]:
-        collection = _database[cls.get_collection_name()]
-        try:
-            instances = collection.find(filter_options)
-            return [document for instance in instances if (document := cls.from_mongo(instance)) is not None]
-        except errors.OperationFailure:
-            logger.error("Failed to retrieve documents")
+@classmethod
+def find(cls: Type[T], **filter_options) -> T | None:
+    collection = _database[cls.get_collection_name()]
+    try:
+        instance = collection.find_one(filter_options)
+        if instance:
+            return cls.from_mongo(instance)
 
-            return []
+        return None
+    except errors.OperationFailure:
+        logger.error("Failed to retrieve document")
+
+        return None
+
+
+@classmethod
+def bulk_find(cls: Type[T], **filter_options) -> list[T]:
+    collection = _database[cls.get_collection_name()]
+    try:
+        instances = collection.find(filter_options)
+        return [document for instance in instances if (document := cls.from_mongo(instance)) is not None]
+    except errors.OperationFailure:
+        logger.error("Failed to retrieve documents")
+
+        return []
 ```
 
 **Collection name resolution** (verbatim):
@@ -352,32 +358,33 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
 **Record ⇄ Point translation** (verbatim):
 
 ```python
-    @classmethod
-    def from_record(cls: Type[T], point: Record) -> T:
-        _id = UUID(point.id, version=4)
-        payload = point.payload or {}
+@classmethod
+def from_record(cls: Type[T], point: Record) -> T:
+    _id = UUID(point.id, version=4)
+    payload = point.payload or {}
 
-        attributes = {
-            "id": _id,
-            **payload,
-        }
-        if cls._has_class_attribute("embedding"):
-            attributes["embedding"] = point.vector or None
+    attributes = {
+        "id": _id,
+        **payload,
+    }
+    if cls._has_class_attribute("embedding"):
+        attributes["embedding"] = point.vector or None
 
-        return cls(**attributes)
+    return cls(**attributes)
 
-    def to_point(self: T, **kwargs) -> PointStruct:
-        exclude_unset = kwargs.pop("exclude_unset", False)
-        by_alias = kwargs.pop("by_alias", True)
 
-        payload = self.model_dump(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs)
+def to_point(self: T, **kwargs) -> PointStruct:
+    exclude_unset = kwargs.pop("exclude_unset", False)
+    by_alias = kwargs.pop("by_alias", True)
 
-        _id = str(payload.pop("id"))
-        vector = payload.pop("embedding", {})
-        if vector and isinstance(vector, np.ndarray):
-            vector = vector.tolist()
+    payload = self.model_dump(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs)
 
-        return PointStruct(id=_id, vector=vector, payload=payload)
+    _id = str(payload.pop("id"))
+    vector = payload.pop("embedding", {})
+    if vector and isinstance(vector, np.ndarray):
+        vector = vector.tolist()
+
+    return PointStruct(id=_id, vector=vector, payload=payload)
 ```
 
 > **Book vs repo discrepancy (FACT)**: the printed book's `from_record` writes `payload["embedding"] = point.vector or None` and `to_point` uses `self.dict(...)`. In this repo the correct code writes to `attributes` and uses `self.model_dump(...)`. `self.dict()` is the deprecated Pydantic v1 API; `model_dump()` is Pydantic v2. The `attributes` version matters: writing into `payload` would leak `embedding` into the stored payload and, for classes without an `embedding` field, would crash construction. Trust the repo.
@@ -400,24 +407,25 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
 **UUID stringification (recursive)**:
 
 ```python
-    def model_dump(self: T, **kwargs) -> dict:
-        dict_ = super().model_dump(**kwargs)
+def model_dump(self: T, **kwargs) -> dict:
+    dict_ = super().model_dump(**kwargs)
 
-        dict_ = self._uuid_to_str(dict_)
+    dict_ = self._uuid_to_str(dict_)
 
-        return dict_
+    return dict_
 
-    def _uuid_to_str(self, item: Any) -> Any:
-        if isinstance(item, dict):
-            for key, value in item.items():
-                if isinstance(value, UUID):
-                    item[key] = str(value)
-                elif isinstance(value, list):
-                    item[key] = [self._uuid_to_str(v) for v in value]
-                elif isinstance(value, dict):
-                    item[key] = {k: self._uuid_to_str(v) for k, v in value.items()}
 
-        return item
+def _uuid_to_str(self, item: Any) -> Any:
+    if isinstance(item, dict):
+        for key, value in item.items():
+            if isinstance(value, UUID):
+                item[key] = str(value)
+            elif isinstance(value, list):
+                item[key] = [self._uuid_to_str(v) for v in value]
+            elif isinstance(value, dict):
+                item[key] = {k: self._uuid_to_str(v) for k, v in value.items()}
+
+    return item
 ```
 
 Unlike the Mongo base, this recursion reaches `metadata` dicts and lists, which is why Qdrant payloads like `metadata={"html_url": ..., "parent_id": ...}` stay serializable.
@@ -425,93 +433,97 @@ Unlike the Mongo base, this recursion reaches `metadata` dicts and lists, which 
 **Bulk insert with just-in-time collection creation** (verbatim):
 
 ```python
-    @classmethod
-    def bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> bool:
+@classmethod
+def bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> bool:
+    try:
+        cls._bulk_insert(documents)
+    except exceptions.UnexpectedResponse:
+        logger.info(
+            f"Collection '{cls.get_collection_name()}' does not exist. Trying to create the collection and reinsert the documents."
+        )
+
+        cls.create_collection()
+
         try:
             cls._bulk_insert(documents)
         except exceptions.UnexpectedResponse:
-            logger.info(
-                f"Collection '{cls.get_collection_name()}' does not exist. Trying to create the collection and reinsert the documents."
-            )
+            logger.error(f"Failed to insert documents in '{cls.get_collection_name()}'.")
 
-            cls.create_collection()
+            return False
 
-            try:
-                cls._bulk_insert(documents)
-            except exceptions.UnexpectedResponse:
-                logger.error(f"Failed to insert documents in '{cls.get_collection_name()}'.")
+    return True
 
-                return False
 
-        return True
+@classmethod
+def _bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> None:
+    points = [doc.to_point() for doc in documents]
 
-    @classmethod
-    def _bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> None:
-        points = [doc.to_point() for doc in documents]
-
-        connection.upsert(collection_name=cls.get_collection_name(), points=points)
+    connection.upsert(collection_name=cls.get_collection_name(), points=points)
 ```
 
 **Search and scroll** (verbatim):
 
 ```python
-    @classmethod
-    def bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
-        try:
-            documents, next_offset = cls._bulk_find(limit=limit, **kwargs)
-        except exceptions.UnexpectedResponse:
-            logger.error(f"Failed to search documents in '{cls.get_collection_name()}'.")
+@classmethod
+def bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
+    try:
+        documents, next_offset = cls._bulk_find(limit=limit, **kwargs)
+    except exceptions.UnexpectedResponse:
+        logger.error(f"Failed to search documents in '{cls.get_collection_name()}'.")
 
-            documents, next_offset = [], None
+        documents, next_offset = [], None
 
-        return documents, next_offset
+    return documents, next_offset
 
-    @classmethod
-    def _bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
-        collection_name = cls.get_collection_name()
 
-        offset = kwargs.pop("offset", None)
-        offset = str(offset) if offset else None
+@classmethod
+def _bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
+    collection_name = cls.get_collection_name()
 
-        records, next_offset = connection.scroll(
-            collection_name=collection_name,
-            limit=limit,
-            with_payload=kwargs.pop("with_payload", True),
-            with_vectors=kwargs.pop("with_vectors", False),
-            offset=offset,
-            **kwargs,
-        )
-        documents = [cls.from_record(record) for record in records]
-        if next_offset is not None:
-            next_offset = UUID(next_offset, version=4)
+    offset = kwargs.pop("offset", None)
+    offset = str(offset) if offset else None
 
-        return documents, next_offset
+    records, next_offset = connection.scroll(
+        collection_name=collection_name,
+        limit=limit,
+        with_payload=kwargs.pop("with_payload", True),
+        with_vectors=kwargs.pop("with_vectors", False),
+        offset=offset,
+        **kwargs,
+    )
+    documents = [cls.from_record(record) for record in records]
+    if next_offset is not None:
+        next_offset = UUID(next_offset, version=4)
 
-    @classmethod
-    def search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
-        try:
-            documents = cls._search(query_vector=query_vector, limit=limit, **kwargs)
-        except exceptions.UnexpectedResponse:
-            logger.error(f"Failed to search documents in '{cls.get_collection_name()}'.")
+    return documents, next_offset
 
-            documents = []
 
-        return documents
+@classmethod
+def search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
+    try:
+        documents = cls._search(query_vector=query_vector, limit=limit, **kwargs)
+    except exceptions.UnexpectedResponse:
+        logger.error(f"Failed to search documents in '{cls.get_collection_name()}'.")
 
-    @classmethod
-    def _search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
-        collection_name = cls.get_collection_name()
-        records = connection.search(
-            collection_name=collection_name,
-            query_vector=query_vector,
-            limit=limit,
-            with_payload=kwargs.pop("with_payload", True),
-            with_vectors=kwargs.pop("with_vectors", False),
-            **kwargs,
-        )
-        documents = [cls.from_record(record) for record in records]
+        documents = []
 
-        return documents
+    return documents
+
+
+@classmethod
+def _search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
+    collection_name = cls.get_collection_name()
+    records = connection.search(
+        collection_name=collection_name,
+        query_vector=query_vector,
+        limit=limit,
+        with_payload=kwargs.pop("with_payload", True),
+        with_vectors=kwargs.pop("with_vectors", False),
+        **kwargs,
+    )
+    documents = [cls.from_record(record) for record in records]
+
+    return documents
 ```
 
 `_bulk_find` wraps Qdrant's `scroll`, returning a `(documents, next_offset)` tuple so callers can paginate through a large collection. `search` runs actual vector similarity; `scroll` does *not*.
@@ -519,38 +531,38 @@ Unlike the Mongo base, this recursion reaches `metadata` dicts and lists, which 
 **Collection management** (verbatim):
 
 ```python
-    @classmethod
-    def get_or_create_collection(cls: Type[T]) -> CollectionInfo:
-        collection_name = cls.get_collection_name()
+@classmethod
+def get_or_create_collection(cls: Type[T]) -> CollectionInfo:
+    collection_name = cls.get_collection_name()
 
-        try:
-            return connection.get_collection(collection_name=collection_name)
-        except exceptions.UnexpectedResponse:
-            use_vector_index = cls.get_use_vector_index()
-
-            collection_created = cls._create_collection(
-                collection_name=collection_name, use_vector_index=use_vector_index
-            )
-            if collection_created is False:
-                raise RuntimeError(f"Couldn't create collection {collection_name}") from None
-
-            return connection.get_collection(collection_name=collection_name)
-
-    @classmethod
-    def create_collection(cls: Type[T]) -> bool:
-        collection_name = cls.get_collection_name()
+    try:
+        return connection.get_collection(collection_name=collection_name)
+    except exceptions.UnexpectedResponse:
         use_vector_index = cls.get_use_vector_index()
 
-        return cls._create_collection(collection_name=collection_name, use_vector_index=use_vector_index)
+        collection_created = cls._create_collection(collection_name=collection_name, use_vector_index=use_vector_index)
+        if collection_created is False:
+            raise RuntimeError(f"Couldn't create collection {collection_name}") from None
 
-    @classmethod
-    def _create_collection(cls, collection_name: str, use_vector_index: bool = True) -> bool:
-        if use_vector_index is True:
-            vectors_config = VectorParams(size=EmbeddingModelSingleton().embedding_size, distance=Distance.COSINE)
-        else:
-            vectors_config = {}
+        return connection.get_collection(collection_name=collection_name)
 
-        return connection.create_collection(collection_name=collection_name, vectors_config=vectors_config)
+
+@classmethod
+def create_collection(cls: Type[T]) -> bool:
+    collection_name = cls.get_collection_name()
+    use_vector_index = cls.get_use_vector_index()
+
+    return cls._create_collection(collection_name=collection_name, use_vector_index=use_vector_index)
+
+
+@classmethod
+def _create_collection(cls, collection_name: str, use_vector_index: bool = True) -> bool:
+    if use_vector_index is True:
+        vectors_config = VectorParams(size=EmbeddingModelSingleton().embedding_size, distance=Distance.COSINE)
+    else:
+        vectors_config = {}
+
+    return connection.create_collection(collection_name=collection_name, vectors_config=vectors_config)
 ```
 
 **Key Concepts**:
@@ -561,31 +573,33 @@ Unlike the Mongo base, this recursion reaches `metadata` dicts and lists, which 
 **Config accessors** (verbatim):
 
 ```python
-    @classmethod
-    def get_category(cls: Type[T]) -> DataCategory:
-        if not hasattr(cls, "Config") or not hasattr(cls.Config, "category"):
-            raise ImproperlyConfigured(
-                "The class should define a Config class with"
-                "the 'category' property that reflects the collection's data category."
-            )
+@classmethod
+def get_category(cls: Type[T]) -> DataCategory:
+    if not hasattr(cls, "Config") or not hasattr(cls.Config, "category"):
+        raise ImproperlyConfigured(
+            "The class should define a Config class with"
+            "the 'category' property that reflects the collection's data category."
+        )
 
-        return cls.Config.category
+    return cls.Config.category
 
-    @classmethod
-    def get_collection_name(cls: Type[T]) -> str:
-        if not hasattr(cls, "Config") or not hasattr(cls.Config, "name"):
-            raise ImproperlyConfigured(
-                "The class should define a Config class withthe 'name' property that reflects the collection's name."
-            )
 
-        return cls.Config.name
+@classmethod
+def get_collection_name(cls: Type[T]) -> str:
+    if not hasattr(cls, "Config") or not hasattr(cls.Config, "name"):
+        raise ImproperlyConfigured(
+            "The class should define a Config class withthe 'name' property that reflects the collection's name."
+        )
 
-    @classmethod
-    def get_use_vector_index(cls: Type[T]) -> bool:
-        if not hasattr(cls, "Config") or not hasattr(cls.Config, "use_vector_index"):
-            return True
+    return cls.Config.name
 
-        return cls.Config.use_vector_index
+
+@classmethod
+def get_use_vector_index(cls: Type[T]) -> bool:
+    if not hasattr(cls, "Config") or not hasattr(cls.Config, "use_vector_index"):
+        return True
+
+    return cls.Config.use_vector_index
 ```
 
 `get_use_vector_index` defaults to `True` when the attribute is absent. That is why the embedded chunk classes can write it explicitly and the chunk classes can omit it (chunks are never inserted directly in the current flow, but if they were, they would be treated as vector collections).
@@ -593,27 +607,29 @@ Unlike the Mongo base, this recursion reaches `metadata` dicts and lists, which 
 **Grouping utilities** (verbatim):
 
 ```python
-    @classmethod
-    def group_by_class(
-        cls: Type["VectorBaseDocument"], documents: list["VectorBaseDocument"]
-    ) -> Dict["VectorBaseDocument", list["VectorBaseDocument"]]:
-        return cls._group_by(documents, selector=lambda doc: doc.__class__)
+@classmethod
+def group_by_class(
+    cls: Type["VectorBaseDocument"], documents: list["VectorBaseDocument"]
+) -> Dict["VectorBaseDocument", list["VectorBaseDocument"]]:
+    return cls._group_by(documents, selector=lambda doc: doc.__class__)
 
-    @classmethod
-    def group_by_category(cls: Type[T], documents: list[T]) -> Dict[DataCategory, list[T]]:
-        return cls._group_by(documents, selector=lambda doc: doc.get_category())
 
-    @classmethod
-    def _group_by(cls: Type[T], documents: list[T], selector: Callable[[T], Any]) -> Dict[Any, list[T]]:
-        grouped = {}
-        for doc in documents:
-            key = selector(doc)
+@classmethod
+def group_by_category(cls: Type[T], documents: list[T]) -> Dict[DataCategory, list[T]]:
+    return cls._group_by(documents, selector=lambda doc: doc.get_category())
 
-            if key not in grouped:
-                grouped[key] = []
-            grouped[key].append(doc)
 
-        return grouped
+@classmethod
+def _group_by(cls: Type[T], documents: list[T], selector: Callable[[T], Any]) -> Dict[Any, list[T]]:
+    grouped = {}
+    for doc in documents:
+        key = selector(doc)
+
+        if key not in grouped:
+            grouped[key] = []
+        grouped[key].append(doc)
+
+    return grouped
 ```
 
 **Reverse lookup** (verbatim):
@@ -1178,9 +1194,9 @@ doc = TweetDocument(
     link="https://x.com/...",
     hashtags=["#llm"],
 )
-saved = doc.save()                 # writes to the "tweets" collection
+saved = doc.save()  # writes to the "tweets" collection
 found = TweetDocument.find(_id=str(doc.id))
-print(found == doc)                # True (equality by id)
+print(found == doc)  # True (equality by id)
 ```
 
 ### Step 4: Inspect collections in MongoDB
@@ -1198,10 +1214,10 @@ docker compose exec mongo mongosh \
 from llm_engineering.domain.embedded_chunks import EmbeddedArticleChunk
 from llm_engineering.application.networks.embeddings import EmbeddingModelSingleton
 
-print("Embedding size:", EmbeddingModelSingleton().embedding_size)   # 384
+print("Embedding size:", EmbeddingModelSingleton().embedding_size)  # 384
 info = EmbeddedArticleChunk.get_or_create_collection()
-print("Vector size:", info.config.params.vectors.size)              # 384
-print("Distance:   ", info.config.params.vectors.distance)          # COSINE
+print("Vector size:", info.config.params.vectors.size)  # 384
+print("Distance:   ", info.config.params.vectors.distance)  # COSINE
 ```
 
 If `embedding_size` is 384 and a query vector has 768 elements, `search()` raises `UnexpectedResponse`, which the public `search()` catches and turns into `[]`. A silent empty result is the classic symptom of a wrong embedding model.
@@ -1244,10 +1260,10 @@ doc = ArticleDocument(
     link="https://example.com/a",
 )
 mongo_doc = doc.to_mongo()
-assert "_id" in mongo_doc and "id" not in mongo_doc      # id renamed
-assert isinstance(mongo_doc["_id"], str)                  # UUID stringified
+assert "_id" in mongo_doc and "id" not in mongo_doc  # id renamed
+assert isinstance(mongo_doc["_id"], str)  # UUID stringified
 restored = ArticleDocument.from_mongo(dict(mongo_doc))
-assert restored == doc                                    # equality by id
+assert restored == doc  # equality by id
 
 # 2. Qdrant round trip (do not hit the DB)
 chunk = EmbeddedArticleChunk(
@@ -1263,7 +1279,7 @@ chunk = EmbeddedArticleChunk(
 point = chunk.to_point()
 assert isinstance(point.id, str)
 assert point.vector and len(point.vector) == 384
-assert "embedding" not in point.payload                   # vector is not in payload
+assert "embedding" not in point.payload  # vector is not in payload
 ```
 
 Then extend it: create a plain `CleanedArticleDocument` (no `embedding` field), call `to_point()`, and confirm `vector` is `{}`/empty and no `embedding` key appears. Finally call `CleanedArticleDocument.from_record` with a synthetic `Record` and confirm it constructs.

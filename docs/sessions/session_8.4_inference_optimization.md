@@ -107,11 +107,12 @@ Derivation for the first row: `2 × 2048 × 32 × 32 × 128 × 2 = 1,073,741,824
 def kv_cache_gb(n_tokens, n_layers, n_kv_heads, dim_head, bytes_per=2):
     return (2 * n_tokens * n_layers * n_kv_heads * dim_head * bytes_per) / 1e9
 
+
 # 7B MHA (32 kv heads), FP16
-print(kv_cache_gb(2048, 32, 32, 128))    # ~1.07 GB
-print(kv_cache_gb(4096, 32, 32, 128))    # ~2.15 GB
+print(kv_cache_gb(2048, 32, 32, 128))  # ~1.07 GB
+print(kv_cache_gb(4096, 32, 32, 128))  # ~2.15 GB
 # Llama-3.1-8B GQA (8 kv heads), FP16
-print(kv_cache_gb(8192, 32, 8, 128))     # ~1.07 GB
+print(kv_cache_gb(8192, 32, 8, 128))  # ~1.07 GB
 ```
 
 **Static KV cache + `torch.compile`**: the cache grows each step, which blocks `torch.compile` because it needs static shapes. Pre-allocating the cache to a maximum fixes the shape and fuses the forward pass, for up to **4x** speedup (book, page 322).
@@ -283,6 +284,7 @@ Represent weights (and sometimes activations) in lower precision.
 ```python
 import torch
 
+
 def absmax_quantize(X):
     # Calculate scale
     scale = 127 / torch.max(torch.abs(X))
@@ -446,13 +448,14 @@ What is **not** wired in but is on the optimization table: static KV cache + `to
 def kv_cache_gb(n_tokens, n_layers, n_kv_heads, dim_head, bytes_per=2):
     return (2 * n_tokens * n_layers * n_kv_heads * dim_head * bytes_per) / 1e9
 
+
 # 7B MHA-style (32 kv heads), FP16
-print(kv_cache_gb(2048, 32, 32, 128))   # ~1.07 GB at 2k tokens
-print(kv_cache_gb(4096, 32, 32, 128))   # ~2.15 GB at 4k tokens
-print(kv_cache_gb(8192, 32, 32, 128))   # ~4.29 GB at 8k tokens
+print(kv_cache_gb(2048, 32, 32, 128))  # ~1.07 GB at 2k tokens
+print(kv_cache_gb(4096, 32, 32, 128))  # ~2.15 GB at 4k tokens
+print(kv_cache_gb(8192, 32, 32, 128))  # ~4.29 GB at 8k tokens
 
 # Llama-3.1-8B GQA (8 kv heads), FP16 - 4x smaller
-print(kv_cache_gb(8192, 32, 8, 128))    # ~1.07 GB at 8k tokens
+print(kv_cache_gb(8192, 32, 8, 128))  # ~1.07 GB at 8k tokens
 ```
 
 On a 16 GB card, an 8B FP16 model (~16 GB weights) does not fit at all; even 4-bit weights (~5 GB) plus a long KV cache plus activations is tight. This is why the book serves on `ml.g5.2xlarge` (24 GB).
@@ -461,6 +464,7 @@ On a 16 GB card, an 8B FP16 model (~16 GB weights) does not fit at all; even 4-b
 
 ```python
 import torch
+
 print("bf16 supported:", torch.cuda.is_bf16_supported())  # False on Turing RTX 5000
 ```
 
@@ -470,17 +474,19 @@ Consequence: use FP16 for training and inference; do not enable `torch.autocast(
 
 ```python
 import torch
-print(torch.cuda.get_device_capability())   # (7, 5) on the RTX 5000
-print(torch.cuda.get_device_name(0))        # NVIDIA Quadro RTX 5000
+
+print(torch.cuda.get_device_capability())  # (7, 5) on the RTX 5000
+print(torch.cuda.get_device_name(0))  # NVIDIA Quadro RTX 5000
 ```
 
 `sm_75` < `sm_80`, so `attn_implementation="flash_attention_2"` will not work. Use SDPA instead:
 
 ```python
 from transformers import AutoModelForCausalLM
+
 model = AutoModelForCausalLM.from_pretrained(
     "mistralai/Mistral-7B-Instruct-v0.3",
-    attn_implementation="sdpa",   # works on Turing; FA2 does not
+    attn_implementation="sdpa",  # works on Turing; FA2 does not
 )
 ```
 
@@ -490,8 +496,13 @@ Download a pre-quantized GGUF (for example a `Q4_K_M` community build) and run i
 
 ```python
 from llama_cpp import Llama
+
 llm = Llama(model_path="model.Q4_K_M.gguf", n_ctx=2048)
-print(llm("Below is an instruction...\n### Instruction:\nWhat is an LLM Twin?\n### Response:\n", max_tokens=128)["choices"][0]["text"])
+print(
+    llm("Below is an instruction...\n### Instruction:\nWhat is an LLM Twin?\n### Response:\n", max_tokens=128)[
+        "choices"
+    ][0]["text"]
+)
 ```
 
 This is the most reliable local option on a 16 GB Turing card, because layers can spill to CPU when VRAM is short.

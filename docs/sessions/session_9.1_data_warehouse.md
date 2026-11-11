@@ -412,7 +412,7 @@ mongo_dict = doc.to_mongo()
 # {"_id": "<uuid str>", "content": "...", "author_id": "1111...", "id"? no — popped}
 
 restored = ArticleDocument.from_mongo(mongo_dict)
-assert restored == doc            # __eq__ compares id only
+assert restored == doc  # __eq__ compares id only
 assert restored.id == doc.id
 assert str(restored.author_id) == str(doc.author_id)
 ```
@@ -465,6 +465,7 @@ print(len(docs))
 
 ```python
 from llm_engineering.domain.base.nosql import _database
+
 _database["articles"].delete_many({})  # drop before re-import
 ```
 
@@ -654,6 +655,7 @@ poetry poe run-feature-engineering-pipeline
 
 ```python
 from llm_engineering.application.rag.retriever import ContextRetriever
+
 docs = ContextRetriever(mock=False).search("How does RAG work?", k=3)
 print(len(docs), "chunks")
 ```

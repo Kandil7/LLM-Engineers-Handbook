@@ -680,7 +680,7 @@ from llm_engineering.application.rag.retriever import ContextRetriever
 
 retriever = ContextRetriever(mock=True)
 docs = retriever.search("My name is Paul Iusztin. How does RAG work?", k=3, expand_to_n_queries=3)
-print(len(docs))   # 0 in mock mode: _search still hits Qdrant, reranker returns chunks unchanged
+print(len(docs))  # 0 in mock mode: _search still hits Qdrant, reranker returns chunks unchanged
 print(docs)
 ```
 
@@ -743,7 +743,7 @@ Expected: three `EmbeddedArticleChunk`-style objects with `author_full_name='Pau
 ```python
 doc = documents[0]
 print(doc.author_full_name)
-print(doc.metadata)        # embedding_model_id, embedding_size, max_input_length
+print(doc.metadata)  # embedding_model_id, embedding_size, max_input_length
 print(type(doc).__name__)  # EmbeddedArticleChunk / EmbeddedPostChunk / EmbeddedRepositoryChunk
 print(doc.platform)
 ```

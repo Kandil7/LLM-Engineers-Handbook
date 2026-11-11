@@ -706,6 +706,7 @@ print("fp16 supported:", torch.cuda.is_available())
 
 ```python
 from pathlib import Path
+
 p = Path("model_sft")
 print([f.name for f in p.iterdir()][:10])
 # expect config.json, tokenizer.*, model.safetensors (fp16, ~16 GB for 8B)

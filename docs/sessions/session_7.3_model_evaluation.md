@@ -618,6 +618,7 @@ The pointwise means above differ by 0.08 on style. Is that real or noise?
 ```python
 import random
 
+
 def bootstrap_diff(a, b, n=1000):
     diffs = []
     for _ in range(n):

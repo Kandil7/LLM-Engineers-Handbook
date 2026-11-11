@@ -375,11 +375,8 @@ A minimal reconciliation sketch:
 # source ids for an author
 source_ids = {str(d.id) for d in ArticleDocument.bulk_find(author_id=user_id)}
 # feature-store ids derived from the cleaned snapshot
-stored_ids = {
-    str(c.document_id)
-    for c in CleanedArticleDocument.bulk_find(author_id=user_id)[0]
-}
-deleted = stored_ids - source_ids          # documents to purge downstream
+stored_ids = {str(c.document_id) for c in CleanedArticleDocument.bulk_find(author_id=user_id)[0]}
+deleted = stored_ids - source_ids  # documents to purge downstream
 ```
 
 ### Push CDC in practice
@@ -502,7 +499,8 @@ Stage 3  log-based streaming CDC           ← full CRUD, delete-safe, sub-secon
 ```python
 # The feature pipeline pulls ALL documents (no last-updated filter).
 from llm_engineering.domain.documents import ArticleDocument
-docs = ArticleDocument.bulk_find(author_id="<user-uuid>")   # full scan
+
+docs = ArticleDocument.bulk_find(author_id="<user-uuid>")  # full scan
 print(len(docs))
 ```
 
@@ -531,6 +529,7 @@ Sketch:
 
 ```python
 from datetime import datetime, timezone
+
 
 def __fetch_articles(user_id, since=None):
     query = {"author_id": user_id}

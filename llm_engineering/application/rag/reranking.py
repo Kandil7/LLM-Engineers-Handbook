@@ -11,7 +11,7 @@ class Reranker(RAGStep):
     def __init__(self, mock: bool = False) -> None:
         super().__init__(mock=mock)
 
-        self._model = CrossEncoderModelSingleton()
+        self._model = None if mock else CrossEncoderModelSingleton()
 
     @opik.track(name="Reranker.generate")
     def generate(self, query: Query, chunks: list[EmbeddedChunk], keep_top_k: int) -> list[EmbeddedChunk]:

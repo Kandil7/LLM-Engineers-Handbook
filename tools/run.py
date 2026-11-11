@@ -175,25 +175,35 @@ def main(
         run_args_cd = {}
         pipeline_args["config_path"] = root_dir / "configs" / "generate_instruct_datasets.yaml"
         pipeline_args["run_name"] = f"generate_instruct_datasets_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+        run_args_cd["mock"] = settings.is_offline
         generate_datasets.with_options(**pipeline_args)(**run_args_cd)
 
     if run_generate_preference_datasets:
         run_args_cd = {}
         pipeline_args["config_path"] = root_dir / "configs" / "generate_preference_datasets.yaml"
         pipeline_args["run_name"] = f"generate_preference_datasets_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+        run_args_cd["mock"] = settings.is_offline
         generate_datasets.with_options(**pipeline_args)(**run_args_cd)
 
     if run_training:
-        run_args_cd = {}
-        pipeline_args["config_path"] = root_dir / "configs" / "training.yaml"
-        pipeline_args["run_name"] = f"training_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-        training.with_options(**pipeline_args)(**run_args_cd)
+        if settings.is_offline:
+            logger.warning(
+                "OFFLINE_MODE is active: training requires AWS SageMaker and cannot run offline. Run on Colab/Vast.ai or set OFFLINE_MODE=false with AWS configured."
+            )
+        else:
+            run_args_cd = {}
+            pipeline_args["config_path"] = root_dir / "configs" / "training.yaml"
+            pipeline_args["run_name"] = f"training_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+            training.with_options(**pipeline_args)(**run_args_cd)
 
     if run_evaluation:
-        run_args_cd = {}
-        pipeline_args["config_path"] = root_dir / "configs" / "evaluating.yaml"
-        pipeline_args["run_name"] = f"evaluation_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
-        evaluating.with_options(**pipeline_args)(**run_args_cd)
+        if settings.is_offline:
+            logger.warning("OFFLINE_MODE is active: evaluation requires AWS SageMaker and cannot run offline.")
+        else:
+            run_args_cd = {}
+            pipeline_args["config_path"] = root_dir / "configs" / "evaluating.yaml"
+            pipeline_args["run_name"] = f"evaluation_run_{dt.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+            evaluating.with_options(**pipeline_args)(**run_args_cd)
 
 
 if __name__ == "__main__":

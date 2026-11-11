@@ -379,6 +379,7 @@ class RepositoryChunkingHandler(ChunkingDataHandler):
             "chunk_size": 1500,
             "chunk_overlap": 100,
         }
+
     # chunk() mirrors PostChunkingHandler but builds RepositoryChunk with name/link
 ```
 
@@ -542,7 +543,7 @@ print(type(doc.content), list(doc.content.keys()))
 from llm_engineering.application.preprocessing import CleaningDispatcher
 
 cleaned = CleaningDispatcher.dispatch(doc)
-print(cleaned.get_collection_name())   # cleaned_articles
+print(cleaned.get_collection_name())  # cleaned_articles
 print(len(cleaned.content), cleaned.content[:200])
 ```
 

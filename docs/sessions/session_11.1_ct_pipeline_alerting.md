@@ -210,6 +210,7 @@ The **business microservice** is the right place to trace, because it coordinate
 import opik
 from opik import opik_context
 
+
 @opik.track
 def call_llm_service(query: str, context: str | None) -> str:
     llm = LLMInferenceSagemakerEndpoint(

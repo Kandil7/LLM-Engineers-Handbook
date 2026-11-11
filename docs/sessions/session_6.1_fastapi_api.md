@@ -569,6 +569,7 @@ requires TGI's SSE endpoint and an async consumer.
 
    ```python
    from starlette.concurrency import run_in_threadpool
+
    answer = await run_in_threadpool(rag, request.query)
    ```
 

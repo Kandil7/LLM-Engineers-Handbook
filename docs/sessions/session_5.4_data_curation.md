@@ -144,6 +144,7 @@ Normalize (e.g. lowercase), hash (MD5 or SHA-256), compare hashes, drop matches.
 ```python
 import hashlib
 
+
 def exact_dedup(samples: list[str]) -> list[str]:
     seen, kept = set(), []
     for s in samples:
@@ -165,9 +166,10 @@ The standard fuzzy approach: high accuracy at much lower complexity than pairwis
 ```python
 from datasketch import MinHash, MinHashLSH
 
+
 def minhash(text: str, num_perm: int = 128) -> MinHash:
     m = MinHash(num_perm=num_perm)
-    for shingle in {text[i:i + 5] for i in range(max(1, len(text) - 4))}:
+    for shingle in {text[i : i + 5] for i in range(max(1, len(text) - 4))}:
         m.update(shingle.encode())
     return m
 ```
@@ -207,10 +209,7 @@ This prevents the implausible benchmark jumps the book warns about in Chapter 7 
 
 ```python
 test_hashes = {hashlib.sha256(t.strip().lower().encode()).hexdigest() for t in test_set}
-train_clean = [
-    s for s in train_set
-    if hashlib.sha256(s.strip().lower().encode()).hexdigest() not in test_hashes
-]
+train_clean = [s for s in train_set if hashlib.sha256(s.strip().lower().encode()).hexdigest() not in test_hashes]
 ```
 
 ---
@@ -379,6 +378,7 @@ For a preference dataset, UltraFeedback maps directly onto the chosen/rejected p
 ```python
 import hashlib
 
+
 def exact_dedup(samples: list[str]) -> list[str]:
     seen, kept = set(), []
     for s in samples:
@@ -394,9 +394,10 @@ def exact_dedup(samples: list[str]) -> list[str]:
 ```python
 from datasketch import MinHash, MinHashLSH
 
+
 def minhash(text: str, num_perm: int = 128) -> MinHash:
     m = MinHash(num_perm=num_perm)
-    for shingle in {text[i:i+5] for i in range(max(1, len(text) - 4))}:
+    for shingle in {text[i : i + 5] for i in range(max(1, len(text) - 4))}:
         m.update(shingle.encode())
     return m
 ```
@@ -430,6 +431,7 @@ JUDGE_PROMPT = """You are a data quality evaluator. Assess the instruction and a
 Score 1 (terrible) to 4 (excellent). Respond as:
 Feedback: ...
 Score: ..."""
+
 
 def judge(instruction: str, answer: str, client) -> str:
     resp = client.chat.completions.create(

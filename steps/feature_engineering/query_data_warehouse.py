@@ -1,9 +1,12 @@
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 from loguru import logger
 from typing_extensions import Annotated
 from zenml import get_step_context, step
 
+from llm_engineering import settings
 from llm_engineering.application import utils
 from llm_engineering.domain.base.nosql import NoSQLBaseDocument
 from llm_engineering.domain.documents import ArticleDocument, Document, PostDocument, RepositoryDocument, UserDocument
@@ -13,6 +16,13 @@ from llm_engineering.domain.documents import ArticleDocument, Document, PostDocu
 def query_data_warehouse(
     author_full_names: list[str],
 ) -> Annotated[list, "raw_documents"]:
+    if settings.is_offline:
+        logger.info("OFFLINE_MODE active: loading raw documents from bundled JSON files.")
+        documents = _load_from_bundled_json()
+        step_context = get_step_context()
+        step_context.add_output_metadata(output_name="raw_documents", metadata=_get_metadata(documents))
+        return documents
+
     documents = []
     authors = []
     for author_full_name in author_full_names:
@@ -31,6 +41,39 @@ def query_data_warehouse(
     step_context = get_step_context()
     step_context.add_output_metadata(output_name="raw_documents", metadata=_get_metadata(documents))
 
+    return documents
+
+
+def _load_from_bundled_json() -> list:
+    data_dir = Path("data/data_warehouse_raw_data")
+    # UserDocument is only needed for author lookup in the online path; skip it
+    # in offline mode so the cleaning/embedding pipeline never sees "users".
+    category_classes = {
+        "ArticleDocument": ArticleDocument,
+        "PostDocument": PostDocument,
+        "RepositoryDocument": RepositoryDocument,
+    }
+    documents = []
+    if not data_dir.is_dir():
+        logger.warning(f"Bundled data dir not found: {data_dir}")
+        return documents
+    for file in data_dir.iterdir():
+        if not file.is_file():
+            continue
+        category_class = category_classes.get(file.stem)
+        if not category_class:
+            continue
+        try:
+            with file.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+            for d in data:
+                try:
+                    documents.append(category_class.from_mongo(d))
+                except Exception as e:
+                    logger.warning(f"Skipping a document from {file.name}: {e}")
+        except Exception as e:
+            logger.exception(f"Failed to load {file}: {e}")
+    logger.info(f"Loaded {len(documents)} documents from bundled JSON.")
     return documents
 
 
@@ -80,7 +123,9 @@ def _get_metadata(documents: list[Document]) -> dict:
             metadata[collection]["authors"] = list()
 
         metadata[collection]["num_documents"] = metadata[collection].get("num_documents", 0) + 1
-        metadata[collection]["authors"].append(document.author_full_name)
+        author = getattr(document, "author_full_name", None)
+        if author is not None:
+            metadata[collection]["authors"].append(author)
 
     for value in metadata.values():
         if isinstance(value, dict) and "authors" in value:

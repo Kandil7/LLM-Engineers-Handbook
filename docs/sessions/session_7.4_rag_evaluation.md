@@ -490,10 +490,12 @@ from datasets import Dataset
 
 data = {
     "question": ["What is our holiday return policy for laptops?"],
-    "contexts": [[
-        "Electronics have a standard 30-day return window. "
-        "During the holiday sale, laptops get an extended 60-day return period."
-    ]],
+    "contexts": [
+        [
+            "Electronics have a standard 30-day return window. "
+            "During the holiday sale, laptops get an extended 60-day return period."
+        ]
+    ],
     "answer": ["Laptops bought during the holiday sale have a 60-day return window, longer than the standard 30 days."],
     "ground_truth": ["Laptops purchased during the holiday sale can be returned within 60 days."],
 }
@@ -610,7 +612,10 @@ from ragas import evaluate
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 
 rows = {
-    "question": [], "contexts": [], "answer": [], "ground_truth": [],
+    "question": [],
+    "contexts": [],
+    "answer": [],
+    "ground_truth": [],
 }
 for sample in eval_samples:
     documents = retriever.search(sample["query"], k=3)
@@ -620,8 +625,7 @@ for sample in eval_samples:
     rows["answer"].append(call_llm_service(sample["query"], context))
     rows["ground_truth"].append(sample["expected_answer"])
 
-result = evaluate(Dataset.from_dict(rows),
-                  metrics=[faithfulness, answer_relevancy, context_precision, context_recall])
+result = evaluate(Dataset.from_dict(rows), metrics=[faithfulness, answer_relevancy, context_precision, context_recall])
 print(result)
 ```
 

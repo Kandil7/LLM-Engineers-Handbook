@@ -231,8 +231,7 @@ class PreferenceSet:
     @classmethod
     def from_json(cls, json_str: str) -> "PreferenceSet":
         data = json.loads(json_str)
-        triples = [(t["instruction"], t["generated_answer"], t["extracted_answer"])
-                   for t in data["preference_triples"]]
+        triples = [(t["instruction"], t["generated_answer"], t["extracted_answer"]) for t in data["preference_triples"]]
         return cls(triples)
 
     def __iter__(self):
@@ -653,9 +652,11 @@ def spans_of(chosen: str, source: str) -> int:
         return 1
     # split on sentence boundary and check both halves
     import re
+
     parts = [p for p in re.split(r"(?<=[.!?])\s+", chosen) if p.strip()]
     found = sum(1 for p in parts if p in source)
     return found if found else 0
+
 
 non_contig = 0
 for ds in split.train.values():

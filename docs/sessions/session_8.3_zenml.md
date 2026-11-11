@@ -130,8 +130,7 @@ def generate_intruction_dataset(
         name="instruct_datasets",
         tags=["dataset", "instruct", "cleaned"],
     ),
-]:
-    ...
+]: ...
 ```
 
 **Key Concepts**:

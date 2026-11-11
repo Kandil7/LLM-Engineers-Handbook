@@ -586,9 +586,9 @@ from llm_engineering.infrastructure.db.mongo import connection as c1
 from llm_engineering.infrastructure.db.mongo import MongoDatabaseConnector
 
 c2 = MongoDatabaseConnector()
-print(c1 is c2)                     # True - same client
-print(type(c2).__name__)            # MongoClient, not MongoDatabaseConnector
-print(c2 is c2.get_database("twin").client)   # True
+print(c1 is c2)  # True - same client
+print(type(c2).__name__)  # MongoClient, not MongoDatabaseConnector
+print(c2 is c2.get_database("twin").client)  # True
 ```
 
 Expected output: `True`, `MongoClient`, `True`. If you see a fresh client each call, the singleton is not being used (for example, the module was re-imported under a different path).
@@ -638,7 +638,8 @@ Reproduce and explain the two most common "it looks connected but nothing works"
 
 ```python
 from llm_engineering.infrastructure.db.mongo import connection
-print("constructed")                     # prints even with Mongo down
+
+print("constructed")  # prints even with Mongo down
 try:
     connection.get_database("twin").command("ping")
 except Exception as e:

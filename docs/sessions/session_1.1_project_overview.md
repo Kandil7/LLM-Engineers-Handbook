@@ -334,8 +334,8 @@ settings = Settings.load_settings()
 ```python
 from llm_engineering.settings import settings
 
-db_name = settings.DATABASE_NAME          # "twin"
-qcloud = settings.USE_QDRANT_CLOUD        # False locally
+db_name = settings.DATABASE_NAME  # "twin"
+qcloud = settings.USE_QDRANT_CLOUD  # False locally
 ```
 
 > **Corrected from an earlier draft**: `COMET_PROJECT` defaults to `"twin"` (not `"llm-engineering"`), and `DATABASE_NAME` exists and defaults to `"twin"`. There is no `SAGEMAKER_ENDPOINT_TRAINING` field. Always trust `llm_engineering/settings.py` over any doc.
@@ -498,6 +498,7 @@ Used for type-safe document operations so `UserDocument.find(...)` returns `User
 ```python
 # llm_engineering/domain/base/nosql.py  (excerpt)
 T = TypeVar("T", bound="NoSQLBaseDocument")
+
 
 class NoSQLBaseDocument(BaseModel, Generic[T], ABC):
     id: UUID4 = Field(default_factory=uuid.uuid4)

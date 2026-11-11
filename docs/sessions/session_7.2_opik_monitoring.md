@@ -138,7 +138,10 @@ see trace structure.
 # llm_engineering/infrastructure/inference_pipeline_api.py
 import opik
 from opik import opik_context
+
 ...
+
+
 @opik.track
 def rag(query: str) -> str:
     retriever = ContextRetriever(mock=False)

@@ -1,5 +1,7 @@
+from loguru import logger
 from zenml import step
 
+from llm_engineering import settings
 from llm_engineering.model.finetuning.sagemaker import run_finetuning_on_sagemaker
 
 
@@ -12,6 +14,10 @@ def train(
     dataset_huggingface_workspace: str = "mlabonne",
     is_dummy: bool = False,
 ) -> None:
+    if settings.is_offline:
+        logger.warning("OFFLINE_MODE active: skipping SageMaker training (cloud-only).")
+        return
+
     run_finetuning_on_sagemaker(
         finetuning_type=finetuning_type,
         num_train_epochs=num_train_epochs,

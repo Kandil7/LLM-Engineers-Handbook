@@ -527,10 +527,10 @@ def generate_datasets(
 # pipelines/generate_datasets.py
 cleaned_documents = cd_steps.query_feature_store(after=wait_for)
 
+
 # steps/generate_datasets/query_feature_store.py
 @step
-def query_feature_store() -> Annotated[list, "queried_cleaned_documents"]:
-    ...
+def query_feature_store() -> Annotated[list, "queried_cleaned_documents"]: ...
 ```
 
 The pipeline passes `after=wait_for`, but the step function declares **no parameters at all**. There is no `after` argument. Depending on the ZenML version and `wait_for` value, this either raises a `TypeError` at pipeline definition time or is silently absorbed by ZenML's step-parameter injection. If you hit a signature error locally, this is the mismatch. The book's `end_to_end_data.yaml` / `feature_engineering.yaml` pipeline (Chapter 4) has a real `after` parameter; this step appears to be an older or re-exported copy.
@@ -616,9 +616,11 @@ class DatasetType(Enum):
     INSTRUCTION = "instruction"
     PREFERENCE = "preference"
 
+
 class InstructDatasetSample(VectorBaseDocument):
     instruction: str
     answer: str
+
 
 class InstructDataset(VectorBaseDocument):
     category: DataCategory

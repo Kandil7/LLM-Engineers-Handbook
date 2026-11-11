@@ -40,6 +40,14 @@ class Settings(BaseSettings):
     AWS_SECRET_KEY: str | None = None
     AWS_ARN_ROLE: str | None = None
 
+    # --- Offline / local LLM settings. ---
+    # When OFFLINE_MODE is True (or OPENAI_API_KEY is unset), the project avoids
+    # all cloud calls (OpenAI, AWS, Comet) and uses a local Ollama instance.
+    OFFLINE_MODE: bool = False
+    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
+    OLLAMA_MODEL_ID: str = "qwen3.5:9b"
+    OLLAMA_EMBEDDING_MODEL_ID: str = "nomic-embed-text"
+
     # --- Optional settings used to tweak the code. ---
 
     # AWS SageMaker
@@ -67,6 +75,10 @@ class Settings(BaseSettings):
     # LinkedIn Credentials
     LINKEDIN_USERNAME: str | None = None
     LINKEDIN_PASSWORD: str | None = None
+
+    @property
+    def is_offline(self) -> bool:
+        return bool(self.OFFLINE_MODE) or not self.OPENAI_API_KEY
 
     @property
     def OPENAI_MAX_TOKEN_WINDOW(self) -> int:

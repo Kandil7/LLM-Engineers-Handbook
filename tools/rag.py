@@ -1,6 +1,7 @@
 from langchain.globals import set_verbose
 from loguru import logger
 
+from llm_engineering import settings
 from llm_engineering.application.rag.retriever import ContextRetriever
 from llm_engineering.infrastructure.opik_utils import configure_opik
 
@@ -17,7 +18,7 @@ if __name__ == "__main__":
             - how it is integrated with vector DBs and large language models (LLMs).
         """
 
-    retriever = ContextRetriever(mock=False)
+    retriever = ContextRetriever(mock=settings.is_offline)
     documents = retriever.search(query, k=9)
 
     logger.info("Retrieved documents:")
